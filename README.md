@@ -15,3 +15,18 @@ This model organizes domain knowledge and provides a language for the team. We c
 1. "Multiple **Customers** are involved with a **Cargo**, each playing a different role."
 2. "The **Cargo** delivery _goal_ is _specified_."
 3. "A series of **Carrier Movements** satisfying the **Specification** will fulfill the delivery _goal_"
+
+A **Handling Event** is a discrete action taken with the Cargo, such as 
+1. loading it onto a ship
+2. clearing it through customs
+
+**Delivery Specification** defines a delivery goal, which at minimum would include a destination and an arrival time, but it can be more complex.
+
+A _role_ distinguishes the different parts played by **Customers** in a shipment. 
+1. One is the "shipper"
+2. One the "receiver
+3. One the "payer" and so on.
+
+**Carrier Movement** represents one particular trip by a particular **Carrier** (such as a truck or a ship) from one **Location** to another. Cargoes can ride from place to place by being loaded onto **Carriers** for the duration of one or more **Carrier Movements**
+
+**Delivery History** reflects what has actually happened to a **Cargo**, as opposed to the **Delivery Specification**, which describes goals. A **Delivery History** object can compute the current **Location** of the **Cargo** by analyzing the last load or unload and the destination of the corresponding **Carrier Movement**. A successful delivery would end with a **Delivery History** that satisfies the goals of the **Delivery Specification**.
