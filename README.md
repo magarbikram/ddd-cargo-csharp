@@ -30,3 +30,9 @@ A _role_ distinguishes the different parts played by **Customers** in a shipment
 **Carrier Movement** represents one particular trip by a particular **Carrier** (such as a truck or a ship) from one **Location** to another. Cargoes can ride from place to place by being loaded onto **Carriers** for the duration of one or more **Carrier Movements**
 
 **Delivery History** reflects what has actually happened to a **Cargo**, as opposed to the **Delivery Specification**, which describes goals. A **Delivery History** object can compute the current **Location** of the **Cargo** by analyzing the last load or unload and the destination of the corresponding **Carrier Movement**. A successful delivery would end with a **Delivery History** that satisfies the goals of the **Delivery Specification**.
+
+In order to frame up a solid implementation, this model still needs some clarification and tightening. 
+
+Remember, ordinarily, model refinement, design and implementation should go hand-in-hand in a iterative development process. But in this chapter we 
+are starting with a relatively mature model, and changes will be motivated strictly by the need to connect
+model with a practical implementation , employing the building block patterns.
