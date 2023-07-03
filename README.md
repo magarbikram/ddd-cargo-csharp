@@ -36,3 +36,18 @@ In order to frame up a solid implementation, this model still needs some clarifi
 Remember, ordinarily, model refinement, design and implementation should go hand-in-hand in a iterative development process. But in this chapter we 
 are starting with a relatively mature model, and changes will be motivated strictly by the need to connect
 model with a practical implementation , employing the building block patterns.
+
+## Isolating the Domain: Introducing the Application
+
+To prevent domain responsibilities from being mixed with those of other parts of the system, let's apply layered architectur 
+to mark off a domain layer.
+
+ Without going into deep analysis, we can identify three user-level application function, which can assign to three application layer 
+ classes.
+ 1. A **Tracking Query** that can access past and present handling of a particular **Cargo**
+ 2. A **Booking Application** that allows a new **Cargo** to be registered and prepares the system for it.
+ 3. An **Incident Logging Application** that can record each handling of the **Cargo** (providing the information that is found
+ by the **Tracking Query**)
+
+ These application classes are coordinators. They should not work out the answers to the questions they ask. That is 
+ domain layer's job.
