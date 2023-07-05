@@ -51,3 +51,52 @@ to mark off a domain layer.
 
  These application classes are coordinators. They should not work out the answers to the questions they ask. That is 
  domain layer's job.
+
+ ## Distinguishing Entities and Value Objects
+ 
+ **Customer**  
+ Let's start with an easy one. A Customer object represents a person or a company, an entity in the usual sense of the 
+ word. The **Customer** object clearly has identity that matters to the user, so it is an **Entity** in the model. How
+ to track it? Tax Id might be appropriate in some cases, but an international company could not use that. This question
+ calls for consultation with a domain expert. We discovered that the company already has a customer database in which each
+ Customer is assigned an Id number at first sales contact. This Id is already used throughout the company; using the number
+ in our software establish continuity of identity between those systems.
+
+ **Cargo**  
+ Two identical crates must be distinguishable, so Cargo objects are **Entities**. In practice, all shipping companies assign
+ tracking Ids to each piece of cargo. This Id will be automatically generated, visible to user, and in this case, probably
+ conveyed to the customer at booking time.
+
+ **Handling Event** and **Carrier Movement**
+ We care about such individual incidents because they allow us to keep track of what is going on. They reflect real world 
+ events, which are not usually interchangable, so they are **Entities**. Each **Carrier Movement** will be identified by a 
+ code obtained from shipping schedule.  
+ 
+ Another discussion with a domain expert reveals that **Handling Events** can be uniquely identified by the combination 
+ of **Cargo** Id, completion time and type. For example, the same **Cargo** cannot be both loaded and unloaded at the 
+ same time.
+
+ **Location**  
+ Two places with same name are not the same. Latitude and longitude could provide a unique key, but probably not a very
+ practical one, since thos measurements are not of interest to most purposes of this system, and they would be fairly 
+ complicated. More likely, the **Location** will be part of a geographical model of some kind that will relate places according
+ to shipping lanes and other domain-specific concerns. So an arbitrary, internal, automatically generated identifier 
+ will suffice.
+
+ **Delivery History**  
+ This is a tricky one. **Delivery Histories** are not interchangable, so they are Entities. But a  **Delivery History**  has 
+ a one-to-one relationship with its **Cargo**, so it doesn't really have an identity of its own. Its identity is borrowed 
+ from the **Cargo** that owns it.
+
+ **Delivery Specification**
+ Although it represents the goal of a **Cargo**, this abstraction doesn't depend on **Cargo**. It really expresses a 
+ hypotheticalstate of some **Delivery History**. We hope that the **Delivery History** attached to our **Cargo** will 
+ eventually satisfy the **Delivery Specification** attached to our **Cargo**. If we had two **Cargoes** going to the same 
+ place, they could share the same **Delivery Specification**, but they could not share the same **Delivery History**, 
+ even though the histories start ouf the same (Empty). **Delivery Speficiacations** are **Value Objects**.
+
+ **Role and Other Attributes**  
+ Role says something about the association it qualifies, but it has no history or continuity. It is a Value Object, and 
+ it could be shared among different  **Cargo**/ **Customer** associations. Other attributes such as time stamps or 
+ names are **Value Objects**
+
