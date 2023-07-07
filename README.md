@@ -105,8 +105,37 @@ to mark off a domain layer.
  are probematic in a design. Also, traversal direction often captures insight into the domain, deepening the
  model itself.
 
- ![Class Diagram with Associations representing a Model of the Shipping Domain](docs/diagrams/DDD%20-%20Cargo%20-%201.1.%20Class%20Diagram%20with%20Associations%20representing%20a%20Model%20of%20the%20Shipping%20Domain.jpg?raw=true "Class Diagram representing a Model of the Shipping Domain")
+ ![Class Diagram with Associations representing a Model of the Shipping Domain](docs/diagrams/DDD%20-%20Cargo%20-%201.1.%20Class%20Diagram%20with%20Associations%20representing%20a%20Model%20of%20the%20Shipping%20Domain.jpg?raw=true "Class Diagram with Associations representing a Model of the Shipping Domain")
 
 [Fig 1.1 Class Diagram with Associations representing a Model of the Shipping Domain](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558916533138&cot=14)
 
 
+## Aggregate Boundaries
+
+**Customer**, **Location** and **Carrier Movement** have their own identities and are shared by many **Cargoes**,
+so they must be the roots of their own Aggregates. Cargo is also obvious Aggregate root, but where to draw 
+the boundary takes some thought.  
+
+The **Cargo** *Aggregate* could sweep in everything that would not exist but for particular **Cargo**, 
+which could include the **Delivery History**, the **Delivery Specification**, and the **Handling Events**.   
+
+This fits for **Delivery History**. No one would lookup a **Delivery History** directly without wanting the 
+**Cargo** itself. With no need for direct global access, and with an identity that is really just derived 
+from the Cargo, the **Delivery History** fits nicely inside **Cargo**'s boundry, and it does not need to be 
+a root.  
+
+The **Delivery Specification** is a Value Object, so there are no complications from including it in the **Cargo**
+*Aggregate*.
+
+The Handling Event is another matter. Previously we have considerd two possible database queries that would
+search for these: 
+
+1. To find the Handling Events for a Delivery History as possible alternate to the collection, would be local within Cargo Aggregate
+2. To find all the operations to load and prepare for a particular Carrier Movement. 
+
+In the second case, it seems that the activity of handling the Cargo has some meaning even when considerd apart
+from the Cargo itself. So the Handling Event should be the root of its own Aggregate.
+
+![Model of the Shipping Domain with Aggregate Boundaries Imposed](docs/diagrams/DDD%20-%20Cargo%20-%202.%20Model%20of%20the%20Shipping%20Domain%20with%20Aggregate%20Boundaries%20Imposed.jpg?raw=true "Model of the Shipping Domain with Aggregate Boundaries Imposed")
+
+[Fig 2. Model of the Shipping Domain with Aggregate Boundaries Imposed](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558945078621&cot=14)
