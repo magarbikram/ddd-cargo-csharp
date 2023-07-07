@@ -100,3 +100,13 @@ to mark off a domain layer.
  it could be shared among different  **Cargo**/ **Customer** associations. Other attributes such as time stamps or 
  names are **Value Objects**
 
+ ## Designing Associations in the Shipping Domain
+ None of the associations in the original diagram specified a traversal direction, but bidirectional associations
+ are probematic in a design. Also, traversal direction often captures insight into the domain, deepening the
+ model itself.
+
+ ![Class Diagram with Associations representing a Model of the Shipping Domain](docs/diagrams/DDD%20-%20Cargo%20-%201.1.%20Class%20Diagram%20with%20Associations%20representing%20a%20Model%20of%20the%20Shipping%20Domain.jpg?raw=true "Class Diagram representing a Model of the Shipping Domain")
+
+[Fig 1.1 Class Diagram with Associations representing a Model of the Shipping Domain](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558916533138&cot=14)
+
+
