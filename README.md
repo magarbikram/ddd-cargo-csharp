@@ -139,3 +139,21 @@ from the Cargo itself. So the Handling Event should be the root of its own Aggre
 ![Model of the Shipping Domain with Aggregate Boundaries Imposed](docs/diagrams/DDD%20-%20Cargo%20-%202.%20Model%20of%20the%20Shipping%20Domain%20with%20Aggregate%20Boundaries%20Imposed.jpg?raw=true "Model of the Shipping Domain with Aggregate Boundaries Imposed")
 
 [Fig 2. Model of the Shipping Domain with Aggregate Boundaries Imposed](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558945078621&cot=14)
+
+## Selecting Repositories
+There are five *Entities* in the design that are root of *Aggregates*, so we can limit our 
+consideration to these, since none of other objects is allowed to have *Repositories*  
+To decide which of these candidats should actually have a Repository, we must go back to the
+application requirements. In order to take a booking through the **Booking Application**, the user
+needs to select the **Customer**(s) playing the various roles (shipper, receiver and so on). So we need
+a **Customer Repository**. We also need to find a Location to specify as the destination for the Cargo,
+so we create a location repository. 
+    The **Activity Logging Applicaiton** needs to allow the user to look up the **Carrier Movement**
+that a **Cargo** is being loaded onto, so we need a **Carrier Movement Repository**. This user 
+must also tell the system which **Cargo** has been loaded, so we need a **Cargo Repository**.   
+For now there is no **Handling Event Repository**, because we decieded to implement the association
+with **Delivery History** as a collection in the first iteration, and we have no application 
+requirement to find out what has been loaded onto a **Carrier Movement**. Either of these reasons
+could change; if they did, then we would add a *Repository*.
+
+![Model Of The Shipping Domain With Repositories](docs/diagrams/DDD%20-%20Cargo%20-%203.%20Model%20of%20the%20Shipping%20Domain%20with%20Repositories.jpg?raw=true "Model Of The Shipping Domain With Repositories")
