@@ -157,3 +157,35 @@ requirement to find out what has been loaded onto a **Carrier Movement**. Either
 could change; if they did, then we would add a *Repository*.
 
 ![Model Of The Shipping Domain With Repositories](docs/diagrams/DDD%20-%20Cargo%20-%203.%20Model%20of%20the%20Shipping%20Domain%20with%20Repositories.jpg?raw=true "Model Of The Shipping Domain With Repositories")
+[Fig 3. Model of the Shipping Domain With Repositories](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558966634663&cot=14)
+
+
+# Walking Through Scenarios
+To cross-check all these decisions, we have to consistently step through scenarios to confirm
+that we can solve application problems effictively.
+
+**Sample Application Feature: Changing the Destination of a Cargo**  
+
+Occasionally, a **Customer** calls up and says, "Oh no! We said to send our cargo to Hackensack, 
+but we really need it in Hoboken." We are here to server, so the system is required to provide
+for this change.  
+**Delivery Specification** is a *Value Object*, so it would be simplest to just to throw away and get
+a new one, then use a setter method on Cargo to replace the old one with the new one.
+
+**Sample Application Feature: Repeat Business**  
+
+The users say that repeated bookings from the same **Customers** tend to be similar, so they want to 
+use old **Cargoes** as prototype for new ones. The application will allow then to find **Cargo** in the
+*Repository* and then select a command to create a new **Cargo** based on the selected one. We'll design
+this using the *Prototype* pattern (Gamma et al. 1995).  
+**Cargo** is an *Entity* and is the root of an *Aggregate*. Therefore, it must be copied carefully; we
+need to consider what happen to each object or attribute enclosed by its *Aggregate* boundary. 
+Lets go over each one:  
+
+- **Delivery History**: We should create a new, empty one, because the history of the old one
+doesn't apply. This is usual case with Entities inside the *Aggregate* boundary.  
+- **Customer Roles**: We should copy the **Map** (or other collection) that holds the keyed references
+to **Customers**, including the keys, because they are likely to play the same roles in the new 
+shipment. But we have to be careful not to copy the Customer objects themselves. We must end up
+to the same Customer objects as the old Cargo object referenced, becuase they are *Entities* 
+outside the *Aggregate* boundary.
