@@ -1,6 +1,18 @@
 # ddd-cargo-csharp
 Cargo System built with DDD pattern. Summary and code from blue book [Domain Driven Design by Eric Evans](https://a.co/d/fRmp7M7)
 
+## Table of Contents
+<!--TOC-->
+  - [Introduction](#introduction)
+  - [Isolating the Domain: Introducing the Application](#isolating-the-domain-introducing-the-application)
+  - [Distinguishing Entities and Value Objects](#distinguishing-entities-and-value-objects)
+  - [Designing Associations in the Shipping Domain](#designing-associations-in-the-shipping-domain)
+  - [Aggregate Boundaries](#aggregate-boundaries)
+  - [Selecting Repositories](#selecting-repositories)
+  - [Walking Through Scenarios](#walking-through-scenarios)
+  - [Object Creation](#object-creation)
+<!--/TOC-->
+
 ## Introduction
 We are developing new software for a cargo shipping company. The initial requirements are 3 basic functions
 1. Track key handling of customer cargo
@@ -160,7 +172,7 @@ could change; if they did, then we would add a *Repository*.
 [Fig 3. Model of the Shipping Domain With Repositories](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558966634663&cot=14)
 
 
-# Walking Through Scenarios
+## Walking Through Scenarios
 To cross-check all these decisions, we have to consistently step through scenarios to confirm
 that we can solve application problems effictively.
 
@@ -281,4 +293,61 @@ were not created, the objects would be inconsistent.
 Creation of the back-pointer could be encapsulated in the Factory (and kept in the domain
 layer where it belongs), but now we will look at an alternative design that eliminates this
 akward interaction altogether.
+
+## Pause for Refactoring: An Alternative Design of the Cargo Aggregate
+Modeling and design is not a constant forward process. It will grind to a halt unless
+there is frequent refactoring to take advantage of new insights to improve the model
+and the design.  
+
+By now, there are couple of cumbersome aspects to this design, although it does work and 
+it does reflect the model. Problems that didn't seem important when starting the design
+are begining to be annoying. Let's go back to one of them and, with the benefit of hindsight,
+stack the design deck in our favor.  
+
+The need to update **Delivery History** when adding a **Handling Event** gets the **Cargo**
+*Aggregate* involved in the transaction. If some other user was modifying **Cargo** at the 
+same time, the **Handling Event** transaction could fail or be delayed. Entering a 
+**Handling Event** is an operational activity that needs to be quick and simple, 
+so an important application requirement is the ability to enter **Handling Events** 
+*without contention*. This pushes us to consider a different design.  
+
+Replacing the **Delivery History's** collection of **Handling Events** with a query 
+would allow **Handling Events** to be added without raising any integrity issues outside 
+its own *Aggregate*. This change would enable such transactions to complete without 
+interference. If there are a lot of **Handling Events** being entered and relatively few 
+queries, this design is more efficient. In fact, if a relational database is the underlying 
+technology, a query was probably being used under the covers anyway to emulate the 
+collection. Using query rather than a collection would also reduce the difficulty of 
+maintaining consistency in the cyclical reference between **Cargo** and **Handling Event**.  
+
+To take responsibility for the queries, we will add a *Repository* for **Handling Events**. 
+The **Handling Event Repository** will support a query for the **Events** related to a 
+certain **Cargo**. In addition, the *Repository* can provide query optimized to answer 
+specific questions efficiently. For example, if a frequent access path is the 
+**Delivery History** finding the last reported load or unload, in order to infer the 
+current status of the **Cargo**, a query could be devised to return just the relevant 
+**Handling Event**. And if we wanted a query to find all **Cargoes** loaded on a particular 
+**Carrier Movement**, we could easily add it.
+
+![Model Of The Shipping Domain With Repositories Refactored](docs/diagrams/DDD%20-%20Cargo%20-%205.%20Model%20of%20the%20Shipping%20Domain%20with%20Repositories%20Refactored.jpg)
+[Fig 5. Implementing Delivery History's collection of Handling Events as a query makes insertion
+of Handling Events simple and free of contention with the Cargo Aggregate](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764559058357213&cot=14)
+
+This leaves **Delivery History** with no persistant state. At this point, there is no real need to keep it around. We could 
+derive **Delivery History** itself whenever it is needed to answer some question. We can derive this object because, although
+the *Entity* will be repeatedly recreated, the association with the same **Cargo** object maintains the thread of continuity
+between incarnations.  
+
+The circular reference is no longer tricky to create and maintain. The Cargo Factory will be simplified to no longer attach
+an empty Delivery History to new instances. Database space can be reduced slightly, and the actual number of persistent 
+objects might be reduced considerably, which is a limited resource in some object database. If the common usage pattern
+is that the user seldom queries for the status of a Cargo until it arrives, then a lot of unneeded work will be avoided
+together.  
+
+On the other hand, if we are using object database, traversing an association or an explicit collection is probably much
+faster than a Repository query. If the access pattern includes frequent listing of the full history, rather than the 
+occasional targeted query of last position, the performance trade-off might favor the explicity collection. And remember
+that the added feature ("What is on this Carrier Movement?") hasn't been requested yet, and may never be, so we don't want
+to pay much for that option. 
+
 

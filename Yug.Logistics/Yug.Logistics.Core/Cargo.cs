@@ -9,11 +9,13 @@
         public Cargo(string id)
         {
             TrackingId = id;
-            DeliveryHistory = new DeliveryHistory(this);
             CustomerRoles = new Dictionary<CustomerRole, Customer>();
         }
 
-
+        public async Task<DeliveryHistory> GetDeliveryHistoryAsync(IHandlingEventRepository eventRepository)
+        {
+            return await new DeliveryHistory(this).FillEventsWith(eventRepository);
+        }
         public Cargo CopyPrototype(string newTrackingId)
         {
             throw new NotSupportedException();
