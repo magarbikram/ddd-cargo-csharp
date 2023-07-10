@@ -1,5 +1,8 @@
 ﻿namespace Yug.Logistics.Core
 {
+    /// <summary>
+    /// even though it's an entity, we don't have to persist anything in database
+    /// </summary>
     public class DeliveryHistory
     {
         public Cargo Cargo { get; }
@@ -8,12 +11,12 @@
         public DeliveryHistory(Cargo cargo)
         {
             Cargo = cargo;
-            _handlingEvents = new List<HandlingEvent>();
         }
 
-        public void Add(HandlingEvent handlingEvent)
+        public async Task<DeliveryHistory> FillEventsWith(IHandlingEventRepository eventRepository)
         {
-            _handlingEvents.Add(handlingEvent);
+            _handlingEvents = (await eventRepository.FindByCargoTrackingIdAsync(Cargo.TrackingId)).ToList();
+            return this;
         }
     }
 }
