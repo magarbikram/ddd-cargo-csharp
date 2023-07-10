@@ -189,3 +189,96 @@ to **Customers**, including the keys, because they are likely to play the same r
 shipment. But we have to be careful not to copy the Customer objects themselves. We must end up
 to the same Customer objects as the old Cargo object referenced, becuase they are *Entities* 
 outside the *Aggregate* boundary.
+
+## Object Creation
+
+**Factories and Constructors for Cargo**  
+Even if we have a fancy Factory for Cargo, or use another Cargo as the Factory, as in "Repeat Business"
+scenario, we still have to have a primitive constructor. We would like the constructor to produce
+an object that fullfills its invariants or at least, in the case of an Entity, has its identity
+intact.  
+Given these decisions, we might create a Factory method on Cargo such as this: 
+```
+public Cargo CopyPrototype(string newTrackingId)
+```
+Or, we might make a method on a standalone Factory such as this: 
+```
+public Cargo NewCargo(Cargo prototype, string newTrackingId)
+```
+A standalone Factory could also encapsulate the process of obtaining a new (automatically 
+generated) Id for a new Cargo, in which case it would need only one argument:
+```
+public Cargo NewCargo(Cargo prototype)
+```
+The result returned from any of these **Factories** would be the same: A **Cargo** with an empty
+**Delivery History**, and a null **Delivery Specification**.  
+The two way association between **Cargo** and **Delivery History** means that neither **Cargo**, nor
+**Delivery History** is complete without point to its counter part, so they must be created 
+together. Remember that **Cargo** is the root of the *Aggregate* that include **Delivery History**. 
+Therefore, we can allow **Cargo**'s constructor or **Factory** to create a **Delivery History**. The 
+**Delivery History** constructors will take a **Cargo** as an argument. The result would be something
+like this:
+```
+public Cargo(string id)
+{
+  TrackingId = id;
+  DeliveryHistory = new DeliveryHistory(this);
+  CustomerRoles = new Dictionary<Role, Customer>();
+}
+```
+
+The result is a new **Cargo** with a new **Delivery History** that points back to the **Cargo**. The
+**Delivery History** constructor is used exclusively by its Aggregate root, namely **Cargo**, so 
+that the composition of **Cargo** is encapsulated.
+
+**Adding Handling Event**
+Each time the cargo is handled in the real world, some user will enter a **Handling Event** 
+using the **Incident Logging Application**.  
+Every class must have primitive constructors. Because the **Handling Event** is an Entity, all 
+attributes that define its identity must be passed to the consturctor. As discussed 
+previously, the** Handling Event** is uniquely identified by the combination of the Id of its
+**Cargo**, the completion time, and the event type. The only other attributes of **Handling Event**
+is the association to **Carrier Movement**, which some types of H**andling Event's** don't event have.
+A basic constructor that creates a valid **Handling Event** would be:
+```
+public HandlingEvent(Cargo cargo, string eventType, DateTimeOffset completionTime
+{
+    Handled = cargo;
+    Type = eventType;
+    CompletionTime = completionTime
+}
+```
+Nonidentifying attributes of an *Entity* can usually be added later. In this case, 
+all attributes of the **Handling Event** are going to be set in the initial transaction and
+never altered(except possibly for correcting data-entry error), so it could be convinient, 
+and make client code more expressive, to add a simple Factory Method to **Handling Event** for 
+each event type, taking all the necessary arguments. For example, a "loading event" does
+involve a **Carrier Movement**:
+```
+public static HandlingEvent NewLoading(Cargo cargo, CarrierMovement loadedOnto, DateTimeOffset timeStamp)
+{
+    HandlingEvent result = new HandlingEvent(cargo, LoadingEvent, timestamp);
+    result.SetCarrierMovement(loadedOnto);
+    return result;
+}
+```
+The **Handling Event** in the model is an abstraction that might encapsulate a variety of
+specialized **Handling Event** classes, ranging from loading and unloading to sealing, storing,
+and other activities not related to **Carriers**. They might be implemented as multiple Subclasses 
+or have complicated initialization or both. By adding Factory Methods to the base class 
+(Handling Event) for each type, instace creation is abstracted, freeing the client from 
+knowledge of the implementation. The *Factory* is responsible for knowing what class was to 
+be instantiated and how it should be initialized.  
+Unfortunately, the story isn't quite that simple. The cycle of references, from **Cargo** to 
+**Delivery History** to **Handling Event** and back to **Cargo**, complicates the instance creation.
+the **Delivery History** holds a collection of **Handling Events** relevent to ints **Cargo**, and the
+new object must be added to this collection as part of the transaction. If this back-pointer
+were not created, the objects would be inconsistent.
+
+![Adding A Handling Event Requires Inserting It Into A Delivery History](docs/diagrams/DDD%20-%20Cargo%20-%204.%20Adding%20a%20Handling%20Event%20requires%20inserting%20it%20into%20a%20Delivery%20History.jpg)
+[Fig 4. Adding A Handling Event Requires Inserting It Into A Delivery History](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764558996557568&cot=14)
+
+Creation of the back-pointer could be encapsulated in the Factory (and kept in the domain
+layer where it belongs), but now we will look at an alternative design that eliminates this
+akward interaction altogether.
+
