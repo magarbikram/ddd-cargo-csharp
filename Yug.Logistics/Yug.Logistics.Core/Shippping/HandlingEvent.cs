@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Yug.Logistics.Core
+namespace Yug.Logistics.Core.Shippping
 {
     public class HandlingEvent
     {

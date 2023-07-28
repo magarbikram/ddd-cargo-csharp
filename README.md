@@ -11,6 +11,8 @@ Cargo System built with DDD pattern. Summary and code from blue book [Domain Dri
   - [Selecting Repositories](#selecting-repositories)
   - [Walking Through Scenarios](#walking-through-scenarios)
   - [Object Creation](#object-creation)
+  - [Pause for Refactoring: An Alternative Design of the Cargo Aggregate](#pause-for-refactoring-an-alternative-design-of-the-cargo-aggregate)
+  - [Modules in the Shipping Model](#modules-in-the-shipping-model)
 <!--/TOC-->
 
 ## Introduction
@@ -349,5 +351,33 @@ faster than a Repository query. If the access pattern includes frequent listing 
 occasional targeted query of last position, the performance trade-off might favor the explicity collection. And remember
 that the added feature ("What is on this Carrier Movement?") hasn't been requested yet, and may never be, so we don't want
 to pay much for that option. 
+
+## Modules in the Shipping Model
+So far we've been looking at so few objects that modularity is not an issue. Now let's look at a little bigger part 
+of the shipping model(but still simplified) to see the organization into Modules that will affect the model. 
+
+Figure 6. shows a model neatly partitioned by a infrastructure driven pacakging. 
+- The objects have been grouped according to the pattern each follows. The result is that
+- objects tha conceptually have little relationship (low cohesion) are crammed together
+- and associations run willy-nilly between all modules(high coupling). 
+- The packages tell a story, but it is not the story of shipping
+
+![D D D   Infrastructure Driven Modules In Shipping Model](docs/diagrams/DDD%20-%20Infrastructure%20Driven%20Modules%20in%20Shipping%20Model.jpg)
+[Fig 6. Infrastructure Driven Modules In Shipping Model](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764559163484716&cot=14)
+
+Instead we should be looking for cohesive concepts and focusing on the project. As with smaller scale modeling decisions
+, there are many ways to do it. Figure 7. shows a straight forward one.  
+The *Module* names in Figure 7 contribute to the team's language. 
+- Our company does *shipping for customers* so that we can *bill* them.
+- Our sales and marketing people deal with *customers*, and make aggrements with them.
+- The operations people do the *shipping*, getting the cargo to its specified destination.
+- The back office takes care of *billing*, submitting invoices according to the pricing in *customer's* agreement.  
+
+That's one story I can tell with this set of modules. This intuitive breakdowns could be refined, certainly, in
+successive iterations, or event replaced entirely, but it is now aiding Model Driven Design and contributing to the
+Ubiquitous Language.  
+
+![D D D   Domain Concept Driven Modules In Shipping Model](docs/diagrams/DDD%20-%20Domain%20Concept%20Driven%20Modules%20in%20Shipping%20Model.jpg)
+[Fig 7. Domain Concept Driven Modules in Shipping Model](https://miro.com/app/board/uXjVM5Gp1iE=/?moveToWidget=3458764559167184911&cot=14)
 
 

@@ -1,4 +1,4 @@
-﻿using Yug.Logistics.Core;
+﻿using Yug.Logistics.Core.Shippping;
 
 namespace Yug.Logistics.Application
 {

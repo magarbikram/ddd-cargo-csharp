@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Yug.Logistics.Core
+namespace Yug.Logistics.Core.Shippping
 {
     public interface IHandlingEventRepository
     {

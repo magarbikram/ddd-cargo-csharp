@@ -1,4 +1,4 @@
-﻿namespace Yug.Logistics.Core
+﻿namespace Yug.Logistics.Core.Shippping
 {
     /// <summary>
     /// even though it's an entity, we don't have to persist anything in database
