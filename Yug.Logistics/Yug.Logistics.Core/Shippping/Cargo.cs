@@ -1,15 +1,15 @@
-﻿namespace Yug.Logistics.Core
+﻿namespace Yug.Logistics.Core.Shippping
 {
     public class Cargo
     {
         public string TrackingId { get; }
         public DeliveryHistory DeliveryHistory { get; }
-        public Dictionary<CustomerRole, Customer> CustomerRoles { get; }
+        public Dictionary<CustomerRole, Customer.Customer> CustomerRoles { get; }
 
         public Cargo(string id)
         {
             TrackingId = id;
-            CustomerRoles = new Dictionary<CustomerRole, Customer>();
+            CustomerRoles = new Dictionary<CustomerRole, Customer.Customer>();
         }
 
         public async Task<DeliveryHistory> GetDeliveryHistoryAsync(IHandlingEventRepository eventRepository)

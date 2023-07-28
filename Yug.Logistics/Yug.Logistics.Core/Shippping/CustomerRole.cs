@@ -1,4 +1,4 @@
-﻿namespace Yug.Logistics.Core
+﻿namespace Yug.Logistics.Core.Shippping
 {
     public enum CustomerRole
     {
